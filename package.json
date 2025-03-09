@@ -1,0 +1,47 @@
+{
+  "name": "scallop",
+  "author": "hiddej2",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {
+    "pebble-clay": "^1.0.4",
+    "pebble-effect-layer": "^1.1.4"
+  },
+  "pebble": {
+    "displayName": "scallop",
+    "uuid": "78fac659-0b6e-4d4b-a00c-82744402096b",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "capabilities": [
+      "configurable"
+    ],
+    "messageKeys": [
+      "BackgroundColor",
+      "ForegroundColor",
+      "MinuteHand",
+      "HourHand",
+      "Invert"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "resources": {
+      "media": [
+        {
+          "type": "pbi8",
+          "name": "SCALLOP",
+          "file": "scallop.png"
+        }
+      ]
+    }
+  }
+}
