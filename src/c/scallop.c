@@ -11,6 +11,9 @@ GPoint screencenter;
 #define MINUTE_HAND_LENGTH 48
 #define HOUR_HAND_LENGTH 32
 
+#define MINUTE_HAND_LENGTH_EMERY 68
+#define HOUR_HAND_LENGTH_EMERY 45
+
 #define SETTINGS_KEY 1
 typedef struct ClaySettings {
   GColor bg_color;
@@ -46,7 +49,11 @@ GPoint gpoint_on_circle(const GPoint center, const int angle, const int radius){
 }
 
 static void update_minute_hand(Layer *layer, GContext * ctx, uint8_t minutes){
+  #ifdef PBL_PLATFORM_EMERY
+  const GPoint hand_end = gpoint_on_circle(screencenter, angle(minutes, 60), MINUTE_HAND_LENGTH_EMERY);
+  #else
   const GPoint hand_end = gpoint_on_circle(screencenter, angle(minutes, 60), MINUTE_HAND_LENGTH);
+  #endif
   graphics_context_set_stroke_width(ctx, 6);
   #ifdef PBL_COLOR
   graphics_context_set_stroke_color(ctx, settings.minute_color);
@@ -57,7 +64,11 @@ static void update_minute_hand(Layer *layer, GContext * ctx, uint8_t minutes){
 }
 
 static void update_hour_hand(Layer *layer, GContext * ctx, const tm * const time){
+  #ifdef PBL_PLATFORM_EMERY
+  const GPoint hand_end = gpoint_on_circle(screencenter, angle_hour(time, true), HOUR_HAND_LENGTH_EMERY);
+  #else
   const GPoint hand_end = gpoint_on_circle(screencenter, angle_hour(time, true), HOUR_HAND_LENGTH);
+  #endif
   graphics_context_set_stroke_width(ctx, 6);
   #ifdef PBL_COLOR
   graphics_context_set_stroke_color(ctx, settings.hour_color);
@@ -74,14 +85,26 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
+  #ifdef PBL_PLATFORM_EMERY
+  graphics_draw_rotated_bitmap(ctx, s_bitmap, GPoint(96, 96), DEG_TO_TRIGANGLE(6*tick_time->tm_sec), screencenter);
+  #else
   graphics_draw_rotated_bitmap(ctx, s_bitmap, GPoint(68, 68), DEG_TO_TRIGANGLE(6*tick_time->tm_sec), screencenter);
+  #endif
   update_minute_hand(layer, ctx, tick_time->tm_min);
   update_hour_hand(layer, ctx, tick_time);
 }
 
+static void get_bitmap(){
+  #ifdef PBL_PLATFORM_EMERY
+  s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SCALLOP_BIG);
+  #else
+  s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SCALLOP);
+  #endif
+}
+
 static void prv_window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_get_root_layer(window));
-  s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SCALLOP);
+  get_bitmap();
   s_canvas_layer = layer_create(bounds);
   screencenter = GPoint(bounds.size.w/2, bounds.size.h/2);
   layer_set_update_proc(s_canvas_layer, canvas_update_proc);
@@ -106,7 +129,7 @@ static void prv_window_unload(Window *window) {
 static void update_colors(){
   #ifdef PBL_COLOR
   window_set_background_color(s_window, settings.bg_color);
-  s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SCALLOP);
+  get_bitmap();
   replace_gbitmap_color(GColorWhite, GColorFromHEX(0xbd35f4), s_bitmap, NULL); //random number which is probably not in the color selector
   replace_gbitmap_color(GColorBlack, settings.fg_color, s_bitmap, NULL);
   replace_gbitmap_color(GColorFromHEX(0xbd35f4), settings.bg_color, s_bitmap, NULL);

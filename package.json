@@ -1,7 +1,7 @@
 {
   "name": "scallop",
   "author": "hiddej2",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "keywords": [
     "pebble-app"
   ],
@@ -19,7 +19,8 @@
       "aplite",
       "basalt",
       "chalk",
-      "diorite"
+      "diorite",
+      "emery"
     ],
     "capabilities": [
       "configurable"
@@ -40,6 +41,11 @@
           "type": "pbi8",
           "name": "SCALLOP",
           "file": "scallop.png"
+        },
+        {
+          "type": "pbi8",
+          "name": "SCALLOP_BIG",
+          "file": "scallop-big.png"
         }
       ]
     }
